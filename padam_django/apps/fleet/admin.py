@@ -15,8 +15,20 @@ class BusStopsInline(admin.TabularInline):
 
 @admin.register(models.BusShift)
 class BusShiftAdmin(admin.ModelAdmin):
+    readonly_fields = ("total_duration",)
     fieldsets = [
-        ("Main", {"fields": ["bus", "driver", "start_datetime", "end_datetime"]}),
+        (
+            "Main",
+            {
+                "fields": [
+                    "bus",
+                    "driver",
+                    "start_datetime",
+                    "end_datetime",
+                    "total_duration",
+                ]
+            },
+        ),
     ]
     inlines = [BusStopsInline]
 
@@ -28,4 +40,4 @@ class DriverAdmin(admin.ModelAdmin):
 
 @admin.register(models.BusStop)
 class BusStopAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ("shift",)
