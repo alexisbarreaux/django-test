@@ -8,9 +8,17 @@ class BusAdmin(admin.ModelAdmin):
     pass
 
 
+class BusStopsInline(admin.TabularInline):
+    model = models.BusStop
+    ordering = ("datetime",)
+
+
 @admin.register(models.BusShift)
 class BusShiftAdmin(admin.ModelAdmin):
-    pass
+    fieldsets = [
+        ("Main", {"fields": ["bus", "driver", "start_datetime", "end_datetime"]}),
+    ]
+    inlines = [BusStopsInline]
 
 
 @admin.register(models.Driver)
