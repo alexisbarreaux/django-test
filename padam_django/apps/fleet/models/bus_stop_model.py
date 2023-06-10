@@ -8,4 +8,4 @@ class BusStop(models.Model):
     stop_time = models.DateTimeField(verbose_name="Bus stop datetime")
 
     def __str__(self):
-        return f"BusStop: {self.place} at {self.stop_time} (id: {self.pk})"
+        return f"BusStop: {self.place} the {self.stop_time.date()} at {self.stop_time.time()} (id: {self.pk})"
