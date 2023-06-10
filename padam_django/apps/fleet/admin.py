@@ -8,6 +8,11 @@ class BusAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(models.BusShift)
+class BusShiftAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.Driver)
 class DriverAdmin(admin.ModelAdmin):
     pass
