@@ -1,10 +1,16 @@
-from datetime import datetime, MINYEAR
+from datetime import datetime, MINYEAR, timedelta
 
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils import timezone
 
 from padam_django.apps.fleet.models.bus_stop_model import BusStop
+from padam_django.apps.fleet.models.bus_model import Bus
+from padam_django.apps.fleet.models.driver_model import Driver
+from padam_django.apps.fleet.exceptions import (
+    DriverOtherShiftsOverlapException,
+    BusOtherShiftsOverlapException,
+)
 
 DEFAULT_DATETIME_FOR_MISSING_STOPS = datetime(
     year=MINYEAR, month=1, day=1, tzinfo=timezone.get_current_timezone()
@@ -12,16 +18,70 @@ DEFAULT_DATETIME_FOR_MISSING_STOPS = datetime(
 
 
 class BusShift(models.Model):
-    bus = models.OneToOneField(
-        "fleet.Bus", on_delete=models.CASCADE, related_name="bus"
+    bus = models.ForeignKey(
+        "fleet.Bus", on_delete=models.CASCADE, related_name="shifts"
     )
-    driver = models.OneToOneField(
-        "fleet.Driver", on_delete=models.CASCADE, related_name="driver"
+    driver = models.ForeignKey(
+        "fleet.Driver", on_delete=models.CASCADE, related_name="shifts"
     )
-    start_datetime = models.DateTimeField(verbose_name="Shift start datetime")
-    end_datetime = models.DateTimeField(verbose_name="Shift end datetime")
-    total_duration = models.DurationField(verbose_name="Total shift duration")
-    has_enough_stops = models.BooleanField(verbose_name="Has enough stops to be valid")
+    start_datetime = models.DateTimeField(
+        verbose_name="Shift start datetime", default=DEFAULT_DATETIME_FOR_MISSING_STOPS
+    )
+    end_datetime = models.DateTimeField(
+        verbose_name="Shift end datetime", default=DEFAULT_DATETIME_FOR_MISSING_STOPS
+    )
+    total_duration = models.DurationField(
+        verbose_name="Total shift duration", default=timedelta(days=0)
+    )
+    has_enough_stops = models.BooleanField(
+        verbose_name="Has enough stops to be valid", default=False
+    )
+
+    def save(self, *args, **kwargs):
+        if self.bus_has_overlapping_shifts():
+            raise BusOtherShiftsOverlapException(
+                "Chosen bus can't be assigned to shift."
+            )
+        elif self.driver_has_overlapping_shifts():
+            raise DriverOtherShiftsOverlapException(
+                "Choosen driver can't be assigned to shift."
+            )
+        else:
+            super().save(*args, **kwargs)
+        return
+
+    def bus_has_overlapping_shifts(self) -> bool:
+        chosen_bus_shifts: QuerySet[BusShift] = self.bus.shifts
+        return self.shifts_overlap_with_self(chosen_bus_shifts)
+
+    def driver_has_overlapping_shifts(self) -> bool:
+        driver_shifts: QuerySet[BusShift] = self.driver.shifts
+        return self.shifts_overlap_with_self(driver_shifts)
+
+    def shifts_overlap_with_self(self, shifts: QuerySet) -> bool:
+        return self.shifts_start_overlap_with_self(
+            shifts
+        ) or self.shifts_end_overlap_with_self(shifts)
+
+    def shifts_start_overlap_with_self(self, shifts: QuerySet) -> bool:
+        return (
+            shifts.filter(
+                start_datetime__gt=self.start_datetime,
+                start_datetime__lt=self.end_datetime,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        )
+
+    def shifts_end_overlap_with_self(self, shifts: QuerySet) -> bool:
+        return (
+            shifts.filter(
+                end_datetime__gt=self.start_datetime,
+                end_datetime__lt=self.end_datetime,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        )
 
     def update_on_linked_stop_change(self):
         ordered_stops = self.get_ascending_linked_stops()
