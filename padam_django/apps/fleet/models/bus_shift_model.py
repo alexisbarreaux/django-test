@@ -89,7 +89,7 @@ class BusShift(models.Model):
 
         self.update_total_duration()
 
-        self.save()
+        self.linked_stops_modifications_only_save()
         return
 
     def update_total_duration(self) -> None:
@@ -124,6 +124,10 @@ class BusShift(models.Model):
             self.end_datetime = last_stop.datetime
         else:
             self.end_datetime = DEFAULT_DATETIME_FOR_MISSING_STOPS
+        return
+
+    def linked_stops_modifications_only_save(self):
+        super().save()
         return
 
     def __str__(self):
