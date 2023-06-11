@@ -15,7 +15,12 @@ class BusStopsInline(admin.TabularInline):
 
 @admin.register(models.BusShift)
 class BusShiftAdmin(admin.ModelAdmin):
-    readonly_fields = ("total_duration",)
+    readonly_fields = (
+        "total_duration",
+        "start_datetime",
+        "end_datetime",
+        "has_enough_stops",
+    )
     fieldsets = [
         (
             "Main",
@@ -29,6 +34,7 @@ class BusShiftAdmin(admin.ModelAdmin):
                 ]
             },
         ),
+        ("Flags", {"fields": ["has_enough_stops"]}),
     ]
     inlines = [BusStopsInline]
 
