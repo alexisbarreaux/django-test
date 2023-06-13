@@ -6,9 +6,6 @@ class DriverOtherShiftsOverlapException(Exception):
     pass
 
 
-class StopWouldOverlapBusOtherShifts(Exception):
+class StopWouldOverlapOtherShifts(Exception):
     pass
 
-
-class StopWouldOverlapDriverOtherShifts(Exception):
-    pass

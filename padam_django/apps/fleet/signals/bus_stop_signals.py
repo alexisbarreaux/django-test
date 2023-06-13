@@ -5,8 +5,7 @@ from padam_django.apps.fleet.models import BusStop
 from padam_django.apps.fleet.exceptions import (
     DriverOtherShiftsOverlapException,
     BusOtherShiftsOverlapException,
-    StopWouldOverlapBusOtherShifts,
-    StopWouldOverlapDriverOtherShifts,
+    StopWouldOverlapOtherShifts,
 )
 
 
@@ -15,12 +14,8 @@ from padam_django.apps.fleet.exceptions import (
 def update_linked_shift(sender, instance: BusStop, using, **kwargs):
     try:
         instance.shift.save()
-    except DriverOtherShiftsOverlapException:
-        raise StopWouldOverlapDriverOtherShifts(
-            f"Can't set stop {instance.pk} to {instance.datetime}. Would overlap driver's other shifts."
-        )
-    except BusOtherShiftsOverlapException:
-        raise StopWouldOverlapBusOtherShifts(
-            f"Can't set stop {instance.pk} to {instance.datetime}. Would overlap bus's other shifts."
-        )
+    except (DriverOtherShiftsOverlapException, BusOtherShiftsOverlapException) as e:
+        raise StopWouldOverlapOtherShifts(
+            f"Can't set stop {instance.pk} to {instance.datetime}. Would overlap other shifts."
+        ) from e
     return
