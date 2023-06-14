@@ -13,12 +13,8 @@ def ensure_overlapping_is_fine(
     sender, instance: BusShift, using, update_fields, **kwargs
 ):
     if instance.bus_has_overlapping_shifts():
-        raise BusOtherShiftsOverlapException(
-            f"{instance.bus} can't be assigned to shift."
-        )
+        raise BusOtherShiftsOverlapException(instance)
     elif instance.driver_has_overlapping_shifts():
-        raise DriverOtherShiftsOverlapException(
-            f"{instance.driver} can't be assigned to shift."
-        )
+        raise DriverOtherShiftsOverlapException(instance)
     else:
         return

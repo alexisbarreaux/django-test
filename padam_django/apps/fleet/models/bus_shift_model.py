@@ -5,10 +5,7 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 
 from padam_django.apps.fleet.models.bus_stop_model import BusStop
-from padam_django.apps.fleet.exceptions import (
-    DriverOtherShiftsOverlapException,
-    BusOtherShiftsOverlapException,
-)
+
 
 DEFAULT_DATETIME_FOR_MISSING_STOPS = datetime(
     year=MINYEAR, month=1, day=1, tzinfo=timezone.get_current_timezone()

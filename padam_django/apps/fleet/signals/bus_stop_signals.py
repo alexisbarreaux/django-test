@@ -16,6 +16,6 @@ def update_linked_shift(sender, instance: BusStop, using, **kwargs):
         instance.shift.save()
     except (DriverOtherShiftsOverlapException, BusOtherShiftsOverlapException) as e:
         raise StopWouldOverlapOtherShifts(
-            f"Can't set stop {instance.pk} to {instance.datetime}. Would overlap other shifts."
+            instance
         ) from e
     return
