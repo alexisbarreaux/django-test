@@ -3,8 +3,7 @@ from django.dispatch import receiver
 
 from padam_django.apps.fleet.models import BusStop
 from padam_django.apps.fleet.exceptions import (
-    DriverOtherShiftsOverlapException,
-    BusOtherShiftsOverlapException,
+    ShiftsOverlapException,
     StopWouldOverlapOtherShifts,
 )
 
@@ -14,8 +13,6 @@ from padam_django.apps.fleet.exceptions import (
 def update_linked_shift(sender, instance: BusStop, using, **kwargs):
     try:
         instance.shift.save()
-    except (DriverOtherShiftsOverlapException, BusOtherShiftsOverlapException) as e:
-        raise StopWouldOverlapOtherShifts(
-            instance
-        ) from e
+    except ShiftsOverlapException as e:
+        raise StopWouldOverlapOtherShifts(instance) from e
     return
