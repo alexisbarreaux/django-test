@@ -1,0 +1,11 @@
+<h1>{{place}} </h1>
+<br>
+{% if stops_at_place %}
+<ul>
+    {% for stop in stops_at_place %}
+    <li>{{ stop }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No stops at place.</p>
+{% endif %}

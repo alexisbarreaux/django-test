@@ -9,3 +9,6 @@ migrate: ## Make migrations
 
 makemigrations: ## Generate database migrations from models state
 	python manage.py makemigrations
+
+shell: ## Open python shell with settings.py path provided to Django
+	python manage.py shell
