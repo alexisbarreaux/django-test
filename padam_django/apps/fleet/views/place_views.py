@@ -1,25 +1,40 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
-from django.shortcuts import render, get_object_or_404
+from typing import Any
+from django.http import HttpResponseRedirect, HttpRequest
+from django.http.request import HttpRequest
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.views import generic
 
 from ..utils import get_ordered_future_stops_to_place
 from padam_django.apps.geography.models import Place
 
 
-def place_choosing(request: HttpRequest) -> HttpResponse:
-    places = Place.objects.all()
-    print(places)
-    return render(request, "fleet/place_choosing.html", {"places": places})
+class PlaceChoosingView(generic.ListView):
+    template_name = "fleet/place_choosing.html"
+    context_object_name = "places"
+    place: Place
+
+    def get_queryset(self):
+        return Place.objects.all()
 
 
-def place_stops_listing(request: HttpRequest, place_id: int) -> HttpResponse:
-    place: Place = get_object_or_404(Place, pk=place_id)
+class PlaceStopsListingView(generic.ListView):
+    template_name = "fleet/place_stops_listing.html"
+    context_object_name = "stops_at_place"
+    place: Place
 
-    stops_at_place = get_ordered_future_stops_to_place(place=place)
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        super().setup(request, *args, **kwargs)
+        self.place = get_object_or_404(Place, pk=self.kwargs["place_id"])
+        return
 
-    context = {"stops_at_place": stops_at_place, "place": place}
+    def get_queryset(self):
+        return get_ordered_future_stops_to_place(place=self.place)
 
-    return render(request, "fleet/place_stops_listing.html", context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["place"] = self.place
+        return context
 
 
 def place_choice_handling(request: HttpRequest) -> HttpResponseRedirect:
