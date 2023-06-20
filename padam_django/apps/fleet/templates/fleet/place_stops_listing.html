@@ -18,7 +18,7 @@
     <p>Currently no scheduled future stops.</p>
     {% endif %}
 
-    <form action="{% url 'fleet:bus_stop_creation' %}" method="post">
+    <form action="{% url 'fleet:bus_stop_creation' place_id=place.id %}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">Request new stop</button>
     </form>

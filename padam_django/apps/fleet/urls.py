@@ -12,5 +12,9 @@ urlpatterns = [
         views.PlaceStopsListingView.as_view(),
         name="place_stops_listing",
     ),
-    path("bus_stop/add", views.bus_stop_creation, name="bus_stop_creation"),
+    path(
+        "bus_stop/add/place=<int:place_id>/",
+        views.bus_stop_creation,
+        name="bus_stop_creation",
+    ),
 ]
