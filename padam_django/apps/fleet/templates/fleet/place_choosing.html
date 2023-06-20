@@ -3,15 +3,17 @@
 {% block content %}
 
 <div class="d-flex flex-column justify-content-center align-items-center mb-3">
-    <h1 class=".mx-auto ">Select the desired place</H1>
+    <h1 class="m-3">Select the desired place</h1>
 
-    <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
-        {% for place in places %}
-        <a href="{% url 'fleet:place_stops_listing' place_id=place.id%}" class="btn btn-primary"
-            aria-current="page">{{place}}</a>
-
-        {% endfor %}
-    </div>
+    <form action="{% url 'fleet:chose_place' %}" method="post">
+        {% csrf_token %}
+        <select class="form-select form-select-lg mb-3" aria-label="Place selecting" name="place_id">
+            {% for place in places %}
+            <option value="{{place.id}}">{{place}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Choose</button>
+    </form>
 </div>
 
 {% endblock %}
