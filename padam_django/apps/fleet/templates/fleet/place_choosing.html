@@ -1,0 +1,17 @@
+{% extends './common_templates/master.html' %}
+
+{% block content %}
+
+<div class="d-flex flex-column justify-content-center align-items-center mb-3">
+    <h1 class=".mx-auto ">Select the desired place</H1>
+
+    <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+        {% for place in places %}
+        <a href="{% url 'fleet:place_stops_listing' place_id=place.id%}" class="btn btn-primary"
+            aria-current="page">{{place}}</a>
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
