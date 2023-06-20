@@ -13,3 +13,7 @@ def place_stops_listing(request, place_id) -> HttpResponse:
     context = {"stops_at_place": stops_at_place, "place": place}
 
     return render(request, "fleet/place_stops_listing.html", context)
+
+
+def place_choosing_form(request) -> HttpResponse:
+    return render(request, "fleet/place_choosing_form.html", {})
