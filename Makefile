@@ -12,3 +12,6 @@ makemigrations: ## Generate database migrations from models state
 
 shell: ## Open python shell with settings.py path provided to Django
 	python manage.py shell
+
+collectstatic: ## Store all needed static files for display
+	python manage.py collectstatic

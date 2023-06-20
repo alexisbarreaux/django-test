@@ -28,3 +28,6 @@ pyvenv.cfg
 /bin
 /share
 notes_perso.txt
+
+# Static collected
+*/static/collected/
