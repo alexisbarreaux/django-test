@@ -1,11 +1,13 @@
 from typing import Any
-from django.http import HttpResponseRedirect, HttpRequest
+
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 
-from ..utils import get_ordered_future_stops_to_place
 from padam_django.apps.geography.models import Place
+
+from ..utils import get_ordered_future_stops_to_place
 
 
 class PlaceChoosingView(generic.ListView):

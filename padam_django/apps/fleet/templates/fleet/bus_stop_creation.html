@@ -1,10 +1,17 @@
 {% extends './common_templates/master.html' %}
+{% load bootstrap5 %}
+
 
 {% block content %}
 {% load static %}
 <div class="d-flex flex-column justify-content-center align-items-center mb-3">
-    <h1>Requesting new bus stop</h1>
-    <img src="{% static '/fleet/svg/bus_stop.svg' %}" alt="Route" />
+    <h1 class="m-3">Requesting new bus stop for {{place.name}}</h1>
+    <form role="form" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons submit='OK' reset="Cancel" %}{% endbuttons %}
+    </form>
+    <img src="{% static '/fleet/svg/bus_stop.svg' %}" width="80%" style="max-width:600px;" alt="Route" />
 </div>
 
 {% endblock %}
