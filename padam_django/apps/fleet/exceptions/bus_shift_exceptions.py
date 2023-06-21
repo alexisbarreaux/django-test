@@ -1,6 +1,11 @@
 from padam_django.apps.fleet.models import BusShift
 
 
+class NoShiftsAvailable(Exception):
+    def __init__(self):
+        super().__init__("There are currently no available shifts.")
+
+
 class ShiftsOverlapException(Exception):
     shift: BusShift
 

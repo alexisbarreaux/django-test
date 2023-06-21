@@ -1,21 +1,18 @@
-from django.forms import ModelForm, Select, TextInput, ValidationError
+from django.forms import DateTimeField, DateTimeInput, Form
 from django.utils import timezone
 
-from padam_django.apps.fleet.models import BusStop
+from ..exceptions import BusStopPastDatetimeError
 
 
-class BusStopCreationForm(ModelForm):
-    class Meta:
-        model = BusStop
-        fields = ["datetime"]
-        widgets = {
-            "datetime": TextInput(attrs={"type": "datetime-local"}),
-        }
+class BusStopCreationForm(Form):
+    datetime = DateTimeField(
+        widget=DateTimeInput(attrs={"type": "datetime-local"}),
+        label="Choose desired date and time for the stop.",
+    )
 
     def clean_datetime(self):
         datetime = self.cleaned_data["datetime"]
         if datetime < timezone.now():
-            raise ValidationError(
-                "Our drivers are the best, but they won't be able to come get you in the past."
-            )
+            raise BusStopPastDatetimeError
+
         return datetime
