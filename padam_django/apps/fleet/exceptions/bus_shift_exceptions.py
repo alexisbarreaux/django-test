@@ -1,4 +1,11 @@
+from django.forms import ValidationError
+
 from padam_django.apps.fleet.models import BusShift
+
+
+class NoShiftsAvailableError(ValidationError):
+    def __init__(self):
+        super().__init__(message="There are currently no available shifts.")
 
 
 class NoShiftsAvailable(Exception):

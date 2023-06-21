@@ -6,15 +6,13 @@ from ..exceptions import NoShiftsAvailable
 from ..models import BusShift, BusStop
 
 
-def get_shift_for_new_stop(stop: BusStop) -> BusShift:
+def get_shift_for_given_datetime(datetime: datetime) -> BusShift:
     if no_shift_is_available():
         raise NoShiftsAvailable
-    elif (
-        active_shift_for_stop := get_shift_active_at_datetime(stop.datetime)
-    ) is not None:
+    elif (active_shift_for_stop := get_shift_active_at_datetime(datetime)) is not None:
         return active_shift_for_stop
     else:
-        return get_shift_closest_to_datetime(stop.datetime)
+        return get_shift_closest_to_datetime(datetime)
 
 
 def no_shift_is_available() -> bool:

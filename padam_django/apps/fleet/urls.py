@@ -17,4 +17,9 @@ urlpatterns = [
         views.bus_stop_creation,
         name="bus_stop_creation",
     ),
+    path(
+        "bus_stop/add/place=<int:place_id>/success/",
+        views.bus_stop_creation_success,
+        name="bus_stop_creation_success",
+    ),
 ]

@@ -15,5 +15,5 @@ def get_ordered_future_stops_to_place(place: Place) -> list[BusStop]:
     )
 
 
-def bus_stop_already_exists(datetime: datetime, place: Place) -> bool:
-    return BusStop.objects.filter(datetime=datetime, place=place).exists()
+def bus_stop_already_exists(stop: BusStop) -> bool:
+    return BusStop.objects.filter(datetime=stop.datetime, place=stop.place).exists()
