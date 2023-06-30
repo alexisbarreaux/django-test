@@ -15,6 +15,15 @@ class BusStopsInline(admin.TabularInline):
 
 @admin.register(models.BusShift)
 class BusShiftAdmin(admin.ModelAdmin):
+    def has_enough_stops(self, instance: models.BusShift) -> bool:
+        """
+        Wrapper to keep has_enough_stops as property in the Model but have a nice
+        display in admin
+        """
+        return instance.has_enough_stops
+
+    has_enough_stops.boolean = True
+
     readonly_fields = (
         "total_duration",
         "start_datetime",

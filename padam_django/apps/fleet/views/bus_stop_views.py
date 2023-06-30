@@ -1,7 +1,6 @@
 from django.forms import ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 
 from padam_django.apps.geography.models import Place
 

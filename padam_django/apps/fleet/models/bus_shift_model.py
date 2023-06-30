@@ -27,9 +27,10 @@ class BusShift(models.Model):
     total_duration = models.DurationField(
         verbose_name="Total shift duration", default=timedelta(days=0)
     )
-    has_enough_stops = models.BooleanField(
-        verbose_name="Has enough stops to be valid", default=False
-    )
+
+    @property
+    def has_enough_stops(self) -> bool:
+        return self.stops.count() >= 2
 
     def save(self, *args, **kwargs):
         ordered_stops = self.get_ascending_linked_stops()
@@ -82,13 +83,8 @@ class BusShift(models.Model):
         return stops.order_by("datetime")
 
     def update_stops_related_fields(self, ordered_stops: QuerySet[BusStop]) -> None:
-        self.update_has_enough_stops(ordered_stops)
         self.update_start_datetime(ordered_stops)
         self.update_end_datetime(ordered_stops)
-        return
-
-    def update_has_enough_stops(self, stops: QuerySet[BusStop]) -> bool:
-        self.has_enough_stops = len(stops) >= 2
         return
 
     def update_start_datetime(self, ordered_stops: QuerySet[BusStop]) -> None:
