@@ -24,21 +24,18 @@ class BusShift(models.Model):
     end_datetime = models.DateTimeField(
         verbose_name="Shift end datetime", default=DEFAULT_DATETIME_FOR_MISSING_STOPS
     )
-    total_duration = models.DurationField(
-        verbose_name="Total shift duration", default=timedelta(days=0)
-    )
 
     @property
     def has_enough_stops(self) -> bool:
         return self.stops.count() >= 2
 
+    @property
+    def total_duration(self) -> timedelta:
+        return self.end_datetime - self.start_datetime
+
     def save(self, *args, **kwargs):
         ordered_stops = self.get_ascending_linked_stops()
         self.update_stops_related_fields(ordered_stops)
-
-        # Must be done after update_stops_related_fields
-        self.update_total_duration()
-
         return super().save(*args, **kwargs)
 
     def bus_has_overlapping_shifts(self) -> bool:
@@ -73,10 +70,6 @@ class BusShift(models.Model):
             .exclude(pk=self.pk)
             .exists()
         )
-
-    def update_total_duration(self) -> None:
-        self.total_duration = self.end_datetime - self.start_datetime
-        return
 
     def get_ascending_linked_stops(self) -> QuerySet[BusStop]:
         stops: QuerySet[BusStop] = self.stops.all()
