@@ -7,7 +7,7 @@ from django.utils import timezone
 from padam_django.apps.fleet.models.bus_stop_model import BusStop
 
 DEFAULT_DATETIME_FOR_SHIFT_WITH_NO_STOPS = datetime(
-    year=MINYEAR, month=1, day=1, tzinfo=timezone.UTC
+    year=MINYEAR, month=1, day=1, tzinfo=timezone.utc
 )
 
 
