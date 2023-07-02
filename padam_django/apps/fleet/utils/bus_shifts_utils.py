@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db.models.query import QuerySet
 
 from ..exceptions import NoShiftsAvailable
-from ..models import BusShift, BusStop
+from ..models import BusShift
 
 
 def get_shift_for_given_datetime(datetime: datetime) -> BusShift:
@@ -64,3 +64,20 @@ def get_shift_with_closest_end_before_datetime(datetime: datetime) -> BusShift:
         .order_by("-end_datetime")
         .first()
     )
+
+
+def are_shifts_overlapping(first_shift: BusShift, second_shift: BusShift) -> bool:
+    # See https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation for more
+    earliest_end = min(first_shift.end_datetime, second_shift.end_datetime)
+    latest_start = max(first_shift.start_datetime, second_shift.start_datetime)
+    return (earliest_end - latest_start).total_seconds() > 0
+
+
+def is_shift_set_overlapping_other_shift(
+    shifts_set: QuerySet[BusShift], other_shift: BusShift
+) -> bool:
+    for shift in shifts_set:
+        if are_shifts_overlapping(first_shift=shift, second_shift=other_shift):
+            return True
+    else:
+        return False

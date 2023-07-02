@@ -38,39 +38,6 @@ class BusShift(models.Model):
         self.update_stops_related_fields(ordered_stops)
         return super().save(*args, **kwargs)
 
-    def bus_has_overlapping_shifts(self) -> bool:
-        chosen_bus_shifts: QuerySet[BusShift] = self.bus.shifts
-        return self.shifts_overlap_with_self(chosen_bus_shifts)
-
-    def driver_has_overlapping_shifts(self) -> bool:
-        driver_shifts: QuerySet[BusShift] = self.driver.shifts
-        return self.shifts_overlap_with_self(driver_shifts)
-
-    def shifts_overlap_with_self(self, shifts: QuerySet) -> bool:
-        return self.shifts_start_overlap_with_self(
-            shifts
-        ) or self.shifts_end_overlap_with_self(shifts)
-
-    def shifts_start_overlap_with_self(self, shifts: QuerySet) -> bool:
-        return (
-            shifts.filter(
-                start_datetime__gt=self.start_datetime,
-                start_datetime__lt=self.end_datetime,
-            )
-            .exclude(pk=self.pk)
-            .exists()
-        )
-
-    def shifts_end_overlap_with_self(self, shifts: QuerySet) -> bool:
-        return (
-            shifts.filter(
-                end_datetime__gt=self.start_datetime,
-                end_datetime__lt=self.end_datetime,
-            )
-            .exclude(pk=self.pk)
-            .exists()
-        )
-
     def get_ascending_linked_stops(self) -> QuerySet[BusStop]:
         stops: QuerySet[BusStop] = self.stops.all()
         return stops.order_by("datetime")
