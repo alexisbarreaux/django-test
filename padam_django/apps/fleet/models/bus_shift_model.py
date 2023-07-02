@@ -18,50 +18,32 @@ class BusShift(models.Model):
     driver = models.ForeignKey(
         "fleet.Driver", on_delete=models.CASCADE, related_name="shifts"
     )
-    start_datetime = models.DateTimeField(
-        verbose_name="Shift start datetime", default=DEFAULT_DATETIME_FOR_MISSING_STOPS
-    )
-    end_datetime = models.DateTimeField(
-        verbose_name="Shift end datetime", default=DEFAULT_DATETIME_FOR_MISSING_STOPS
-    )
 
     @property
     def has_enough_stops(self) -> bool:
         return self.stops.count() >= 2
 
     @property
+    def start_datetime(self) -> datetime:
+        try:
+            return self.get_ascending_linked_stops().first().datetime
+        except AttributeError:
+            return DEFAULT_DATETIME_FOR_MISSING_STOPS
+
+    @property
+    def end_datetime(self) -> datetime:
+        try:
+            return self.get_ascending_linked_stops().last().datetime
+        except AttributeError:
+            return DEFAULT_DATETIME_FOR_MISSING_STOPS
+
+    @property
     def total_duration(self) -> timedelta:
         return self.end_datetime - self.start_datetime
-
-    def save(self, *args, **kwargs):
-        ordered_stops = self.get_ascending_linked_stops()
-        self.update_stops_related_fields(ordered_stops)
-        return super().save(*args, **kwargs)
 
     def get_ascending_linked_stops(self) -> QuerySet[BusStop]:
         stops: QuerySet[BusStop] = self.stops.all()
         return stops.order_by("datetime")
-
-    def update_stops_related_fields(self, ordered_stops: QuerySet[BusStop]) -> None:
-        self.update_start_datetime(ordered_stops)
-        self.update_end_datetime(ordered_stops)
-        return
-
-    def update_start_datetime(self, ordered_stops: QuerySet[BusStop]) -> None:
-        first_stop: BusStop = ordered_stops.first()
-        if first_stop is not None:
-            self.start_datetime = first_stop.datetime
-        else:
-            self.start_datetime = DEFAULT_DATETIME_FOR_MISSING_STOPS
-        return
-
-    def update_end_datetime(self, ordered_stops: QuerySet[BusStop]) -> None:
-        last_stop: BusStop = ordered_stops.last()
-        if last_stop is not None:
-            self.end_datetime = last_stop.datetime
-        else:
-            self.end_datetime = DEFAULT_DATETIME_FOR_MISSING_STOPS
-        return
 
     def __str__(self):
         return f"BusShift: {self.bus} by {self.driver} from {self.start_datetime} to {self.end_datetime} (id: {self.pk})"
