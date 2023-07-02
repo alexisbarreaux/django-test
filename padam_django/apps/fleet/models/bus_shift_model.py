@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from padam_django.apps.fleet.models.bus_stop_model import BusStop
 
-DEFAULT_DATETIME_FOR_MISSING_STOPS = datetime(
-    year=MINYEAR, month=1, day=1, tzinfo=timezone.get_current_timezone()
+DEFAULT_DATETIME_FOR_SHIFT_WITH_NO_STOPS = datetime(
+    year=MINYEAR, month=1, day=1, tzinfo=timezone.UTC
 )
 
 
@@ -28,14 +28,14 @@ class BusShift(models.Model):
         try:
             return self.get_ascending_linked_stops().first().datetime
         except AttributeError:
-            return DEFAULT_DATETIME_FOR_MISSING_STOPS
+            return DEFAULT_DATETIME_FOR_SHIFT_WITH_NO_STOPS
 
     @property
     def end_datetime(self) -> datetime:
         try:
             return self.get_ascending_linked_stops().last().datetime
         except AttributeError:
-            return DEFAULT_DATETIME_FOR_MISSING_STOPS
+            return DEFAULT_DATETIME_FOR_SHIFT_WITH_NO_STOPS
 
     @property
     def total_duration(self) -> timedelta:
