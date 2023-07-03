@@ -70,7 +70,23 @@ def are_shifts_overlapping(first_shift: BusShift, second_shift: BusShift) -> boo
     # See https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation for more
     earliest_end = min(first_shift.end_datetime, second_shift.end_datetime)
     latest_start = max(first_shift.start_datetime, second_shift.start_datetime)
-    return (earliest_end - latest_start).total_seconds() > 0
+    overlap_duration = (earliest_end - latest_start).total_seconds()
+
+    if overlap_duration > 0:
+        return True
+    elif overlap_duration == 0 and (
+        second_shift.start_datetime
+        < first_shift.start_datetime
+        < second_shift.end_datetime
+        or first_shift.start_datetime
+        < second_shift.start_datetime
+        < first_shift.end_datetime
+    ):
+        # In this case, one of the shifts is reduced to a single stop which is
+        # strictly between the start and end of the other shift
+        return True
+    else:
+        return False
 
 
 def is_shift_set_overlapping_other_shift(

@@ -15,3 +15,9 @@ shell: ## Open python shell with settings.py path provided to Django
 
 collectstatic: ## Store all needed static files for display
 	python manage.py collectstatic
+
+test: ## Run all tests
+	make test_fleet
+
+test_fleet: ## Run all tests in fleet app
+	python manage.py test ./padam_django/apps/fleet/
